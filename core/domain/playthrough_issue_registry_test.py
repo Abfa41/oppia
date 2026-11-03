@@ -19,6 +19,7 @@
 from __future__ import annotations
 
 import importlib
+from unittest import mock
 
 from core.domain import playthrough_issue_registry
 from core.tests import test_utils
@@ -118,6 +119,48 @@ class IssueRegistryUnitTests(test_utils.GenericTestBase):
             )
             > 0
         )
+
+    def test_refresh_skips_classes_returned_by_getattr_without_base_issue(
+        self,
+    ) -> None:
+        """Test _refresh skips a non-issue class returned by getattr."""
+
+        class NotAnIssue:
+            """A dummy class that does not inherit from
+            BaseExplorationIssueSpec.
+            """
+
+        original_getattr = getattr
+
+        def mock_getattr(module: Any, name: str) -> Any:
+            if name == 'EarlyQuit':
+                return NotAnIssue
+            return original_getattr(module, name)
+
+        with mock.patch.object(
+            playthrough_issue_registry,
+            'getattr',
+            side_effect=mock_getattr,
+            create=True,
+        ):
+            playthrough_issue_registry.Registry._refresh()  # pylint: disable=protected-access
+
+        self.assertNotIn(
+            'EarlyQuit',
+            playthrough_issue_registry.Registry._issues,  # pylint: disable=protected-access
+        )
+
+    def test_get_all_issues_refreshes_when_cache_is_empty(self) -> None:
+        """Test that get_all_issues calls _refresh for an empty cache."""
+        playthrough_issue_registry.Registry._issues = {}  # pylint: disable=protected-access
+
+        with mock.patch.object(
+            playthrough_issue_registry.Registry, '_refresh'
+        ) as mock_refresh:
+            issues = playthrough_issue_registry.Registry.get_all_issues()
+
+        self.assertEqual(issues, [])
+        mock_refresh.assert_called_once()
 
     def test_get_all_issues_returns_cached_when_already_populated(
         self,

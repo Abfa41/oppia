@@ -351,6 +351,46 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
             set(actual_component_class_names),
         )
 
+    def test_get_component_types_when_components_module_is_found(self) -> None:
+        """Test component classes are returned when the module is found."""
+
+        class TestComponent:
+            """Dummy component class used to test module discovery."""
+
+        mock_loader = mock.MagicMock()
+        mock_spec = mock.MagicMock()
+        mock_spec.loader = mock_loader
+        mock_loader.find_spec.return_value = mock_spec
+        mock_module = type(
+            'MockModule', (), {'TestComponent': TestComponent}
+        )
+
+        with mock.patch.object(
+            pkgutil,
+            'iter_modules',
+            return_value=[(mock_loader, 'components', None)],
+        ):
+            with mock.patch.object(
+                rte_component_registry.importlib.util,
+                'module_from_spec',
+                return_value=mock_module,
+            ):
+                with mock.patch.object(
+                    rte_component_registry.Registry,
+                    'get_all_rte_components',
+                    return_value={'TestComponent': {}},
+                ):
+                    component_types = (
+                        rte_component_registry.Registry.get_component_types_to_component_classes()
+                    )
+
+        self.assertEqual(
+            component_types,
+            {'oppia-noninteractive-testcomponent': TestComponent},
+        )
+        mock_loader.find_spec.assert_called_once_with('components')
+        mock_loader.exec_module.assert_called_once_with(mock_module)
+
     @mock.patch('pkgutil.iter_modules')
     def test_get_non_component_types_to_component_classes(
         self, mock_iter_modules: mock.Mock

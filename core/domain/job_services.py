@@ -33,16 +33,21 @@ if MYPY:  # pragma: no cover
 datastore_services = models.Registry.import_datastore_services()
 
 
-def get_job_by_id(job_id: str) -> Optional[job_domain.Job]:
+def get_job_by_id(
+    job_id: str, include_deleted: bool = False
+) -> Optional[job_domain.Job]:
     """Returns the job with the given ID, if it exists.
 
     Args:
         job_id: str. The ID of the job.
+        include_deleted: bool. Whether to include jobs marked as deleted.
 
     Returns:
         Job|None. The corresponding job, or None if it does not exist.
     """
-    job_model = job_models.JobModel.get(job_id, strict=False)
+    job_model = job_models.JobModel.get(
+        job_id, strict=False, include_deleted=include_deleted
+    )
     if job_model is None:
         return None
     return get_job_from_model(job_model)

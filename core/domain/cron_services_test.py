@@ -91,7 +91,9 @@ class CronServicesTests(test_utils.GenericTestBase):
         ):
             job_services.save_job(job)
 
-        self.assertIsNotNone(job_services.get_job_by_id('job_id'))
+        self.assertIsNotNone(
+            job_services.get_job_by_id('job_id', include_deleted=True)
+        )
 
         cron_services.mark_outdated_models_as_deleted()
 

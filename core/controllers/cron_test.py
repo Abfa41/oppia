@@ -191,7 +191,9 @@ class CronJobTests(test_utils.GenericTestBase):
 
         with self.testapp_swap:
             self.get_json('/cron/models/cleanup')
-            self.assertIsNotNone(job_services.get_job_by_id('job_id'))
+            self.assertIsNotNone(
+                job_services.get_job_by_id('job_id', include_deleted=True)
+            )
 
             future_time = current_time + datetime.timedelta(days=181)
             with self.swap(

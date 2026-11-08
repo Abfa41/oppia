@@ -28,6 +28,7 @@ from typing import Any, Dict, List
 class JobTests(test_utils.GenericTestBase):
     """Tests for the Job domain object."""
 
+    # Here we use type Any because the values in this dictionary can be of any type.
     def _get_valid_job_dict(self) -> Dict[str, Any]:
         """Returns a dictionary representing a valid completed job."""
         return {
@@ -52,6 +53,7 @@ class JobTests(test_utils.GenericTestBase):
         self.assertEqual(job.to_dict(), job_dict)
 
     def test_validate_accepts_all_statuses(self) -> None:
+        # Here we use type Any because the values in this dictionary can be of any type.
         status_dicts: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',
@@ -203,6 +205,7 @@ class JobTests(test_utils.GenericTestBase):
             job_domain.Job.from_dict(job_dict)
 
     def test_validate_rejects_timestamps_inconsistent_with_status(self) -> None:
+        # Here we use type Any because the values in this dictionary can be of any type.
         invalid_timestamp_updates: List[Dict[str, Any]] = [
             {
                 'status_code': 'new',

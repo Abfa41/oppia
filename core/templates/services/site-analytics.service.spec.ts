@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SiteAnalyticsService.
  */
 
-
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {DOCUMENT} from '@angular/common';
 import {SiteAnalyticsService} from 'services/site-analytics.service';

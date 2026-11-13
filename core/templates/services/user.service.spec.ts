@@ -16,7 +16,6 @@
  * @fileoverview Tests that the user service is working as expected.
  */
 
-
 import {
   HttpClientTestingModule,
   HttpTestingController,

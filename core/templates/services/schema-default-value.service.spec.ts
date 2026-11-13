@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for SchemaDefaultValueService.
  */
 
-
 import {TestBed} from '@angular/core/testing';
 
 import {LoggerService} from 'services/contextual/logger.service';
@@ -76,9 +75,10 @@ describe('Schema Default Value Service', () => {
         },
       ],
     } as Schema;
-    expect(
-      sdvs.getDefaultValue(schema) as (boolean | number)[]
-    ).toEqual([false, 0]);
+    expect(sdvs.getDefaultValue(schema) as (boolean | number)[]).toEqual([
+      false,
+      0,
+    ]);
 
     let schema2 = {
       type: 'list',

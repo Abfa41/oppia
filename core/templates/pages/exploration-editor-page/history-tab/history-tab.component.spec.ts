@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
-// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {EditabilityService} from 'services/editability.service';
@@ -38,6 +37,8 @@ import {
 } from './services/compare-versions.service';
 import {ExplorationDataService} from '../services/exploration-data.service';
 import {RouterService} from '../services/router.service';
+import {ExplorationMetadata} from 'domain/exploration/exploration-metadata.model';
+import {ParamSpecs} from 'domain/exploration/param-specs.model';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 
 class MockNgbModalRef {
@@ -64,6 +65,34 @@ describe('History tab component', () => {
 
   let mockRefreshVersionHistoryEmitter = new EventEmitter();
   let explorationId = 'exp1';
+  const mockExplorationMetadata = new ExplorationMetadata(
+    'title',
+    'category',
+    'objective',
+    'en',
+    [],
+    '',
+    '',
+    55,
+    'Introduction',
+    new ParamSpecs({}),
+    [],
+    false,
+    true
+  );
+
+  const mockCompareVersionData: CompareVersionData = {
+    nodes: {},
+    links: [],
+    finalStateIds: [],
+    v1InitStateId: 1,
+    v2InitStateId: 2,
+    v1States: {},
+    v2States: {},
+    v1Metadata: mockExplorationMetadata,
+    v2Metadata: mockExplorationMetadata,
+  };
+
   let snapshots = [
     {
       commit_message: 'This is the commit message',
@@ -74,10 +103,10 @@ describe('History tab component', () => {
       commit_cmds: [],
     },
     {
-      commit_messag: '',
-      version_nume: 'This is the commit message 2',
+      commit_message: 'This is the commit message 2',
       committer_id: 'committer_3',
-      commit_typeber: 2,
+      commit_type: '',
+      version_number: 2,
       created_on_ms: 1416563100000,
       commit_cmds: [],
     },
@@ -137,10 +166,7 @@ describe('History tab component', () => {
     );
     fixture.detectChanges();
 
-    component.diffData = {
-      v1Metadata: null,
-      v2Metadata: null,
-    } as CompareVersionData;
+    component.diffData = mockCompareVersionData;
     component.compareVersionMetadata = {
       earlierVersion: {
         versionNumber: 2,
@@ -286,7 +312,7 @@ describe('History tab component', () => {
     tick();
 
     expect(component.hideHistoryGraph).toBe(true);
-    expect(component.diffData).toEqual({v1Metadata: null, v2Metadata: null});
+    expect(component.diffData).toEqual(mockCompareVersionData);
 
     expect(component.earlierVersionHeader).toBe('');
     expect(component.laterVersionHeader).toBe('');
@@ -347,10 +373,7 @@ describe('History tab component', () => {
       } as NgbModalRef;
     });
 
-    component.diffData = {
-      v1Metadata: null,
-      v2Metadata: null,
-    } as CompareVersionData;
+    component.diffData = mockCompareVersionData;
     component.showExplorationMetadataDiffModal();
 
     expect(spyObj).toHaveBeenCalled();
@@ -366,10 +389,7 @@ describe('History tab component', () => {
       result: Promise.reject(),
     } as NgbModalRef);
 
-    component.diffData = {
-      v1Metadata: null,
-      v2Metadata: null,
-    } as CompareVersionData;
+    component.diffData = mockCompareVersionData;
 
     component.showExplorationMetadataDiffModal();
     tick();
@@ -378,12 +398,13 @@ describe('History tab component', () => {
   }));
 
   it('should open a new tab for download exploration with version', () => {
+    let mockOpen = jasmine.createSpy('open');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
-      open: jasmine.createSpy('open', () => {}),
-    });
+      open: mockOpen as (url?: string, target?: string) => Window,
+    } as Window);
     component.downloadExplorationWithVersion(1);
 
-    expect(windowRef.nativeWindow.open).toHaveBeenCalledWith(
+    expect(mockOpen).toHaveBeenCalledWith(
       '/createhandler/download/exp1?v=1',
       '&output_format=zip'
     );
@@ -439,11 +460,12 @@ describe('History tab component', () => {
   }));
 
   it('should reload page when closing revert exploration modal', fakeAsync(() => {
+    let mockReload = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: jasmine.createSpy('reload', () => {}),
-      },
-    });
+        reload: mockReload,
+      } as Pick<Location, 'reload'> as Location,
+    } as Window);
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: new MockNgbModalRef(),
       result: Promise.resolve(1),
@@ -457,7 +479,7 @@ describe('History tab component', () => {
     tick();
 
     expect(spyObj).toHaveBeenCalled();
-    expect(windowRef.nativeWindow.location.reload).toHaveBeenCalled();
+    expect(mockReload).toHaveBeenCalled();
   }));
 
   it('should handle failed revert exploration request', fakeAsync(() => {
@@ -477,11 +499,12 @@ describe('History tab component', () => {
   }));
 
   it('should not reload page when dismissing revert exploration modal', () => {
+    let mockReload = jasmine.createSpy('reload');
     spyOnProperty(windowRef, 'nativeWindow').and.returnValue({
       location: {
-        reload: jasmine.createSpy('reload', () => {}),
-      },
-    });
+        reload: mockReload,
+      } as Pick<Location, 'reload'> as Location,
+    } as Window);
     spyOn(ngbModal, 'open').and.returnValue({
       componentInstance: new MockNgbModalRef(),
       result: Promise.reject(),
@@ -489,7 +512,7 @@ describe('History tab component', () => {
 
     component.showRevertExplorationModal(1);
 
-    expect(windowRef.nativeWindow.location.reload).not.toHaveBeenCalled();
+    expect(mockReload).not.toHaveBeenCalled();
   });
 
   it('should return if the content is editable', () => {
@@ -646,10 +669,7 @@ describe('History tab component', () => {
 
   it('should return when earlierIndex or laterIndex is null', fakeAsync(() => {
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({
-        v1Metadata: null,
-        v2Metadata: null,
-      } as CompareVersionData)
+      Promise.resolve(mockCompareVersionData)
     );
 
     component.selectedVersionsArray = [10, 20];
@@ -704,10 +724,7 @@ describe('History tab component', () => {
 
   it('should return when earlierVersion becomes undefined in promise callback', fakeAsync(() => {
     spyOn(compareVersionsService, 'getDiffGraphData').and.returnValue(
-      Promise.resolve({
-        v1Metadata: null,
-        v2Metadata: null,
-      } as CompareVersionData)
+      Promise.resolve(mockCompareVersionData)
     );
 
     spyOn(component, 'getVersionHeader');

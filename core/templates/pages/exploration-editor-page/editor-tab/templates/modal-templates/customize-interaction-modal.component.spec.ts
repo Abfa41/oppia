@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for Customize Interaction Modal.
  */
 
-// @ts-nocheck
 
 import {
   ChangeDetectorRef,
@@ -575,7 +574,7 @@ describe('Customize Interaction Modal Component', () => {
       ' for DragAndDropSortInput intreaction',
     fakeAsync(() => {
       spyOn(component, 'getContentIdToContent').and.returnValue(
-        SubtitledUnicode.createDefault('unicode', 'contentId 1')
+        {'contentId 1': 'unicode'}
       );
 
       stateInteractionIdService.displayed = 'DragAndDropSortInput';

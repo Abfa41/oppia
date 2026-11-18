@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TrainingDataEditorPanelServiceModalcomponent.
  */
 
-// @ts-nocheck
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
@@ -125,7 +124,7 @@ class MockAnswerClassificationService {
     return {
       outcome: {
         dest: 'dest',
-        feedback: 'feedback',
+        feedback: new SubtitledHtml('feedback', 'contentId'),
       },
       classificationCategorization: 'explicit Type',
     };
@@ -297,7 +296,7 @@ describe('Training Data Editor Panel Component', () => {
     component.submitAnswer('answer');
 
     expect(component.newAnswerTemplate).toBe('answer');
-    expect(component.newAnswerFeedback).toEqual('feedback');
+    expect(component.newAnswerFeedback).toEqual(new SubtitledHtml('feedback', 'contentId'));
     expect(component.newAnswerOutcomeDest).toBe('dest');
     expect(component.newAnswerIsAlreadyResolved).toBe(false);
   });

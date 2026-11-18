@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for State Graph Visualization directive.
  */
 
-// @ts-nocheck
 
 import {
   EventEmitter,

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for TeachOppiaModalComponent.
  */
 
-// @ts-nocheck
 
 import {EventEmitter, Injector, NO_ERRORS_SCHEMA} from '@angular/core';
 import {

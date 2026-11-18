@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for exploration editor page component.
  */
 
-// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -129,7 +128,7 @@ describe('Exploration editor page component', () => {
   let ueps: UserExplorationPermissionsService;
   let ics: InternetConnectivityService;
   let pageContextService: PageContextService;
-  let mockEnterEditorForTheFirstTime: EventEmitter<void>;
+  let mockEnterEditorForTheFirstTime: EventEmitter<string>;
   let registerAcceptTutorialModalEventSpy: jasmine.Spy;
   let registerDeclineTutorialModalEventSpy: jasmine.Spy;
   let focusManagerService: FocusManagerService;
@@ -137,12 +136,12 @@ describe('Exploration editor page component', () => {
   let entityTranslationsService: EntityTranslationsService;
   let entityBulkTranslationsBackendApiService: EntityBulkTranslationsBackendApiService;
   let ngbModal: NgbModal;
-  let refreshGraphEmitter = new EventEmitter<void>();
+  let refreshGraphEmitter = new EventEmitter<string>();
   let mockRefreshTranslationTabEventEmitter = new EventEmitter<void>();
   let autosaveIsInProgress = new EventEmitter<boolean>();
   let mockConnectionServiceEmitter = new EventEmitter<boolean>();
-  let mockOpenEditorTutorialEmitter = new EventEmitter<void>();
-  let mockOpenTranslationTutorialEmitter = new EventEmitter<void>();
+  let mockOpenEditorTutorialEmitter = new EventEmitter<string>();
+  let mockOpenTranslationTutorialEmitter = new EventEmitter<string>();
   let mockInitExplorationPageEmitter = new EventEmitter<void>();
   let isLocationSetToNonStateEditorTabSpy: jasmine.Spy;
   let mockPlatformFeatureService = new MockPlatformFeatureService();
@@ -504,7 +503,7 @@ describe('Exploration editor page component', () => {
       component.isWarningsAreShown(true);
       tick();
 
-      mockOpenEditorTutorialEmitter.emit();
+      mockOpenEditorTutorialEmitter.emit('');
       expect(component.startEditorTutorial).toHaveBeenCalled();
       expect(sers.onRefreshStateEditor.emit).toHaveBeenCalled();
 
@@ -551,7 +550,7 @@ describe('Exploration editor page component', () => {
       tick();
 
       expect(rs.getActiveTabName()).toBe('settings');
-      mockOpenEditorTutorialEmitter.emit();
+      mockOpenEditorTutorialEmitter.emit('');
       expect(component.startEditorTutorial).toHaveBeenCalled();
       expect(rs.navigateToMainTab).toHaveBeenCalled();
     }));
@@ -565,7 +564,7 @@ describe('Exploration editor page component', () => {
 
       tick();
 
-      mockOpenTranslationTutorialEmitter.emit();
+      mockOpenTranslationTutorialEmitter.emit('');
       expect(component.startTranslationTutorial).toHaveBeenCalled();
 
       flush();
@@ -580,7 +579,7 @@ describe('Exploration editor page component', () => {
 
       rs.navigateToSettingsTab();
       tick();
-      mockOpenTranslationTutorialEmitter.emit();
+      mockOpenTranslationTutorialEmitter.emit('');
       tick();
 
       expect(component.startTranslationTutorial).toHaveBeenCalled();
@@ -1011,7 +1010,7 @@ describe('Exploration editor page component', () => {
     });
 
     it('should react when refreshing graph', () => {
-      refreshGraphEmitter.emit();
+      refreshGraphEmitter.emit('');
 
       expect(gds.recompute).toHaveBeenCalled();
       expect(ews.updateWarnings).toHaveBeenCalled();
@@ -1213,7 +1212,7 @@ describe('Exploration editor page component', () => {
         sas,
         'registerDeclineTutorialModalEvent'
       );
-      mockEnterEditorForTheFirstTime = new EventEmitter();
+      mockEnterEditorForTheFirstTime = new EventEmitter<string>();
       spyOn(efbas, 'fetchExplorationFeaturesAsync').and.returnValue(
         Promise.resolve(null)
       );
@@ -1276,7 +1275,7 @@ describe('Exploration editor page component', () => {
       spyOn(component, 'showWelcomeExplorationModal').and.callThrough();
       component.ngOnInit();
       tick();
-      mockEnterEditorForTheFirstTime.emit();
+      mockEnterEditorForTheFirstTime.emit('');
       tick();
 
       expect(component.showWelcomeExplorationModal).toHaveBeenCalled();

@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for editorNavigation.
  */
 
-// @ts-nocheck
 
 import {EventEmitter, NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -268,9 +267,11 @@ describe('Editor Navigation Component', () => {
       let warnings = [
         {
           type: 'ERROR',
+          message: '',
         },
         {
           type: 'CRITICAL',
+          message: '',
         },
       ];
       spyOn(explorationWarningsService, 'getWarnings').and.returnValue(
@@ -343,6 +344,7 @@ describe('Editor Navigation Component', () => {
         'subscribe'
       ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
         callback(true);
+        return new Subscription();
       });
       component.ngOnInit();
       expect(component.autosaveIsInProgress).toBe(true);
@@ -354,6 +356,7 @@ describe('Editor Navigation Component', () => {
         'subscribe'
       ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
         callback(false);
+        return new Subscription();
       });
       component.ngOnInit();
       expect(component.autosaveIsInProgress).toBe(false);

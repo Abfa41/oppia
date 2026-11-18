@@ -1,3 +1,4 @@
+import { Subscription } from 'rxjs';
 // Copyright 2020 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +17,6 @@
  * @fileoverview Unit tests for explorationSaveAndPublishButtons.
  */
 
-// @ts-nocheck
 
 import {NO_ERRORS_SCHEMA} from '@angular/core';
 import {
@@ -275,6 +275,7 @@ describe('Exploration save and publish buttons component', () => {
       'subscribe'
     ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
       callback(true);
+      return new Subscription();
     });
     component.ngOnInit();
     expect(component.autosaveIsInProgress).toBe(true);
@@ -286,6 +287,7 @@ describe('Exploration save and publish buttons component', () => {
       'subscribe'
     ).and.callFake((callback: (autosaveInProgress: boolean) => void) => {
       callback(false);
+      return new Subscription();
     });
     component.ngOnInit();
     expect(component.autosaveIsInProgress).toBe(false);
